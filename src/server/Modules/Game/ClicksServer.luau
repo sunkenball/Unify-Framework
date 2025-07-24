@@ -1,10 +1,15 @@
+-- Services
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
 -- Variables
 local Packages = ReplicatedStorage.Packages
 
+local Modules = script.Parent.Parent
+local Framework = Modules.Framework
+
 local Unify = require(Packages.Unify)
 
-local DataServer: typeof(require(script.Parent.Parent.Framework.DataServer))
+local DataServer: typeof(require(Framework.DataServer))
 
 -- Module
 local Clicks = {

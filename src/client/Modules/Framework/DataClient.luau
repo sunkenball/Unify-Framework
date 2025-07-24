@@ -26,9 +26,15 @@ do
 	end
 
 	function Data:GetAsync(): Promise<PlayerData>
-		return Unify:Get("Data"):andThen(function(data: PlayerData)
-			CLIENT_DATA = data
-			return data
+		return Promise.new(function(resolve, reject)
+			Unify:Get("Data")
+				:andThen(function(data: PlayerData)
+					CLIENT_DATA = data
+					return data
+				end)
+				:finally(function()
+					resolve(CLIENT_DATA)
+				end)
 		end)
 	end
 
@@ -53,7 +59,7 @@ do
 			ON_LOADED_CALLBACKS = onLoadedCallbacks
 		end
 
-		table.insert(onLoadedCallbacks, callback, CLIENT_DATA)
+		table.insert(onLoadedCallbacks, callback)
 	end
 end
 
@@ -62,9 +68,9 @@ do
 
 	do
 		DataServer.Changed:Connect(function(key: string, oldValue: any, newValue: any)
-			print("Data changed:", key, oldValue, newValue)
-
 			CLIENT_DATA[key] = newValue
+
+			print("Data changed:", key, oldValue, newValue, CLIENT_DATA)
 
 			do
 				local onChangedCallbacks = ON_CHANGED_CALLBACKS[key]

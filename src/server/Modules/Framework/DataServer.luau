@@ -11,6 +11,8 @@ local IS_STUDIO = RunService:IsStudio()
 local STUDIO_VERSION = "0.0.0"
 local GAME_VERSION = "0.0.0"
 
+local SHOULD_SAVE = true
+
 local MOCK = false
 
 local DATA_VERSION = if IS_STUDIO then STUDIO_VERSION else GAME_VERSION
@@ -122,12 +124,12 @@ function Data:Create(player: Player)
 		end)
 	end
 
-	local playerData = playerSession.Data
+	local playerData = if SHOULD_SAVE then playerSession.Data else table.clone(playerSession.Data)
 
 	local dataMimic = setmetatable({}, {
 		__index = playerData,
 		__tostring = function()
-			return "Print a specific index of the player data"
+			return "Print a specific index of the player data, or print DataServer:GetRaw(<Player>)"
 		end,
 		__newindex = function(_, key: string, newValue: any)
 			local oldValue = playerData[key]
