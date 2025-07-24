@@ -4,7 +4,7 @@ local HttpService = game:GetService("HttpService")
 -- Module
 local Functions = {}
 
-function Functions.getId()
+function Functions.getId(): string
 	return string.lower(HttpService:GenerateGUID(false))
 end
 
