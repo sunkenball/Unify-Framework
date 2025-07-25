@@ -34,7 +34,8 @@ do
 				end)
 				:finally(function()
 					resolve(CLIENT_DATA)
-				end):catch(reject)
+				end)
+				:catch(reject)
 		end)
 	end
 

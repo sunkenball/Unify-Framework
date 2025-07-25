@@ -36,7 +36,7 @@ function Pets:Give(player: Player, petName: string)
 
 	local petId = Functions.getId()
 
-	local pets = Functions.deepCopy(playerData.Pets)
+	local pets = playerData.Pets
 
 	pets[petId] = self:Create(petName, petId)
 
