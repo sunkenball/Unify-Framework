@@ -7,39 +7,42 @@ local ON_CHANGED_CALLBACKS = {}
 local ON_LOADED_CALLBACKS = {}
 
 local Packages = ReplicatedStorage.Packages
+local Shared = ReplicatedStorage.Shared
 
 local DataServer
 
 local Unify = require(Packages.Unify)
 local Promise = require(Packages.Promise)
 
+local Types = require(Shared.Types)
+
 -- Types
-type PlayerData = any
+type PlayerData = Types.Data
 type Promise<T> = typeof(Promise.new())
 
 -- Module
-local Data = {}
+local DataClient = {}
 
 do
-	function Data:Get(): PlayerData?
+	function DataClient:Get(): PlayerData?
 		return CLIENT_DATA
 	end
 
-	function Data:GetAsync(): Promise<PlayerData>
+	function DataClient:GetAsync(): Promise<PlayerData>
 		return Promise.new(function(resolve, reject)
-			Unify:Get("Data")
-				:andThen(function(data: PlayerData)
-					CLIENT_DATA = data
-					return data
-				end)
-				:finally(function()
-					resolve(CLIENT_DATA)
-				end)
-				:catch(reject)
+			local playerData = self:Get()
+
+			if not playerData then
+				repeat
+					task.wait()
+				until self:Get()
+			end
+
+			DataServer:Get():andThen(resolve):catch(reject)
 		end)
 	end
 
-	function Data:OnChanged(key: string, callback: (oldValue: any, newValue: any) -> any)
+	function DataClient:OnChanged(key: string, callback: (oldValue: any, newValue: any) -> any)
 		local onChangedCallbacks = ON_CHANGED_CALLBACKS[key]
 
 		if not onChangedCallbacks then
@@ -51,7 +54,7 @@ do
 		table.insert(onChangedCallbacks, callback)
 	end
 
-	function Data:OnLoaded(callback: (playerData: PlayerData) -> any)
+	function DataClient:OnLoaded(callback: (playerData: PlayerData) -> any)
 		local onLoadedCallbacks = ON_LOADED_CALLBACKS
 
 		if not onLoadedCallbacks then
@@ -62,52 +65,58 @@ do
 
 		table.insert(onLoadedCallbacks, callback)
 	end
+
+	function DataClient.onLoaded(playerData: PlayerData)
+		print("Data loaded:", playerData)
+
+		CLIENT_DATA = playerData
+
+		do
+			local onLoadedCallbacks = ON_LOADED_CALLBACKS
+
+			if onLoadedCallbacks then
+				for i = 1, #onLoadedCallbacks do
+					local callback = onLoadedCallbacks[i]
+
+					if callback then
+						task.spawn(callback, playerData)
+					end
+				end
+			end
+		end
+	end
+
+	function DataClient.onChanged(key: string, oldValue: any, newValue: any)
+		CLIENT_DATA[key] = newValue
+
+		print("Data changed:", key, oldValue, newValue, CLIENT_DATA)
+
+		do
+			local onChangedCallbacks = ON_CHANGED_CALLBACKS[key]
+
+			if onChangedCallbacks then
+				for i = 1, #onChangedCallbacks do
+					local callback = onChangedCallbacks[i]
+
+					if callback then
+						task.spawn(callback, oldValue, newValue)
+					end
+				end
+			end
+		end
+	end
 end
 
 do
 	DataServer = Unify:Get("DataServer")
 
 	do
-		DataServer.Changed:Connect(function(key: string, oldValue: any, newValue: any)
-			CLIENT_DATA[key] = newValue
+		DataServer.Changed:Connect(DataClient.onChanged)
 
-			print("Data changed:", key, oldValue, newValue, CLIENT_DATA)
+		DataServer.Loaded:Once(DataClient.onLoaded)
 
-			do
-				local onChangedCallbacks = ON_CHANGED_CALLBACKS[key]
-
-				if onChangedCallbacks then
-					for i = 1, #onChangedCallbacks do
-						local callback = onChangedCallbacks[i]
-
-						if callback then
-							task.spawn(callback, oldValue, newValue)
-						end
-					end
-				end
-			end
-		end)
-
-		DataServer.Loaded:Once(function(playerData: PlayerData)
-			print("Data loaded:", playerData)
-
-			CLIENT_DATA = playerData
-
-			do
-				local onLoadedCallbacks = ON_LOADED_CALLBACKS
-
-				if onLoadedCallbacks then
-					for i = 1, #onLoadedCallbacks do
-						local callback = onLoadedCallbacks[i]
-
-						if callback then
-							task.spawn(callback, playerData)
-						end
-					end
-				end
-			end
-		end)
+		DataClient:GetAsync()
 	end
 end
 
-return Data
+return DataClient
