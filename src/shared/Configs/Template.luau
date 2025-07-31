@@ -1,3 +1,3 @@
 return {
-	Clicks = 0,
+	["Clicks"] = 0,
 }
