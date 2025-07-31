@@ -46,7 +46,13 @@ function LeaderstatsServer:Create(player: Player)
 	})
 
 	DataServer:OnDataChanged(player, function(key: string, _: any, newValue: any)
-		local leaderstat = leaderstats:FindFirstChild(Functions.switchKeysAndValues(LeaderstatsConfig)[key])
+		local leaderstatName = Functions.switchKeysAndValues(LeaderstatsConfig)[key]
+
+		if not leaderstatName then
+			return
+		end
+
+		local leaderstat = leaderstats:FindFirstChild(leaderstatName)
 
 		leaderstat.Value = Functions.abbreviate(newValue, COMMA_THRESHOLD)
 	end)
