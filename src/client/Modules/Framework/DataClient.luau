@@ -42,16 +42,22 @@ do
 		end)
 	end
 
-	function DataClient:OnChanged(key: string, callback: (oldValue: any, newValue: any) -> any)
-		local onChangedCallbacks = ON_CHANGED_CALLBACKS[key]
+	function DataClient:OnChanged(key: string | { string }, callback: (oldValue: any, newValue: any) -> any)
+		if type(key) == "string" then
+			local onChangedCallbacks = ON_CHANGED_CALLBACKS[key]
 
-		if not onChangedCallbacks then
-			onChangedCallbacks = {}
+			if not onChangedCallbacks then
+				onChangedCallbacks = {}
 
-			ON_CHANGED_CALLBACKS[key] = onChangedCallbacks
+				ON_CHANGED_CALLBACKS[key] = onChangedCallbacks
+			end
+
+			table.insert(onChangedCallbacks, callback)
+		elseif type(key) == "table" then
+			for _, key in key do
+				self:OnChanged(key, callback)
+			end
 		end
-
-		table.insert(onChangedCallbacks, callback)
 	end
 
 	function DataClient:OnLoaded(callback: (playerData: PlayerData) -> any)
