@@ -13,9 +13,9 @@ version = "4.0.0"
 dependencies = []
 
 [[package]]
-name = "ollie/unifytest"
+name = "ollie/unify-framework"
 version = "0.1.0"
-dependencies = [["ProfileStore", "2jammers/profilestore@0.1.0"], ["Promise", "evaera/promise@4.0.0"], ["Signal", "sleitnick/signal@2.0.3"], ["Unify", "sunkenball/unify@1.0.0"]]
+dependencies = [["ProfileStore", "2jammers/profilestore@0.1.0"], ["Promise", "evaera/promise@4.0.0"], ["Signal", "sleitnick/signal@2.0.3"], ["Unify", "sunkenball/unify@1.0.1"]]
 
 [[package]]
 name = "sleitnick/signal"
@@ -24,5 +24,5 @@ dependencies = []
 
 [[package]]
 name = "sunkenball/unify"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [["Promise", "evaera/promise@4.0.0"]]

@@ -1,5 +1,9 @@
 local Functions = {}
 
+function Functions.uuid()
+	return string.lower(string.gsub(game:GetService("HttpService"):GenerateGUID(false), "-", ""))
+end
+
 function Functions.deepCopy(array: { [any]: any }): { [any]: any }
 	local copy = {}
 
