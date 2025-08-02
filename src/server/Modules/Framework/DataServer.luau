@@ -150,11 +150,13 @@ function DataServer:Create(player: Player)
 			do
 				local callbacks = ON_DATA_CHANGED_CALLBACKS[player]
 
-				for i = 1, #callbacks do
-					local callback = callbacks[i]
+				if callbacks then
+					for i = 1, #callbacks do
+						local callback = callbacks[i]
 
-					if callback then
-						task.spawn(callback, key, playerData[key], newValue)
+						if callback then
+							task.spawn(callback, key, playerData[key], newValue)
+						end
 					end
 				end
 			end
