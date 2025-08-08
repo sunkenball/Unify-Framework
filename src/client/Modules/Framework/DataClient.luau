@@ -114,15 +114,17 @@ do
 end
 
 do
-	DataServer = Unify:Get("DataServer")
+	Unify:OnRan()
+		:andThen(function()
+			DataServer = Unify:Get("DataServer")
+		end)
+		:finally(function()
+			DataServer.Changed:Connect(DataClient.onChanged)
 
-	do
-		DataServer.Changed:Connect(DataClient.onChanged)
+			DataServer.Loaded:Once(DataClient.onLoaded)
 
-		DataServer.Loaded:Once(DataClient.onLoaded)
-
-		DataClient:GetAsync()
-	end
+			DataClient:GetAsync()
+		end)
 end
 
 return DataClient

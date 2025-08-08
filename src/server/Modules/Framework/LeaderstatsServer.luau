@@ -59,13 +59,15 @@ function LeaderstatsServer:Create(player: Player)
 end
 
 do
-	DataServer = Unify:Get("DataServer")
-end
-
-do
-	DataServer:OnPlayerAdded(function(player: Player)
-		LeaderstatsServer:Create(player)
-	end)
+	Unify:OnRan()
+		:andThen(function()
+			DataServer = Unify:Get("DataServer")
+		end)
+		:finally(function()
+			DataServer:OnPlayerAdded(function(player: Player)
+				LeaderstatsServer:Create(player)
+			end)
+		end)
 end
 
 return LeaderstatsServer
