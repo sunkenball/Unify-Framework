@@ -142,7 +142,9 @@ function DataServer:Create(player: Player)
 	local playerData = if SHOULD_SAVE then playerSession.Data else Functions.deepCopy(playerSession.Data)
 
 	local dataMimic = setmetatable({}, {
-		__index = playerData,
+		__index = function(_, key: string)
+			return Functions.deepCopy(playerData)[key]
+		end,
 		__tostring = function()
 			return "Print a specific index of the player data, or print using DataServer:GetRaw(<Player>)"
 		end,
