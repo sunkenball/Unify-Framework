@@ -73,7 +73,7 @@ function DataServer:GetRaw(player: Player)
 		return
 	end
 
-	return getmetatable(mimic).__index
+	return mimic()
 end
 
 function DataServer:GetRawAsync(player: Player, timeout: number?)
@@ -144,6 +144,9 @@ function DataServer:Create(player: Player)
 	local dataMimic = setmetatable({}, {
 		__index = function(_, key: string)
 			return Functions.deepCopy(playerData)[key]
+		end,
+		__call = function()
+			return playerData
 		end,
 		__tostring = function()
 			return "Print a specific index of the player data, or print using DataServer:GetRaw(<Player>)"
