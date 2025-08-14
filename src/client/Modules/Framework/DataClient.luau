@@ -93,6 +93,10 @@ do
 	end
 
 	function DataClient.onChanged(key: string, oldValue: any, newValue: any)
+		if not CLIENT_DATA then
+			return
+		end
+
 		CLIENT_DATA[key] = newValue
 
 		print("Data changed:", key, oldValue, newValue, CLIENT_DATA)
