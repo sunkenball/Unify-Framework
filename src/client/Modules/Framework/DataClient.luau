@@ -42,7 +42,10 @@ do
 		end)
 	end
 
-	function DataClient:OnChanged(key: string | { string }, callback: (oldValue: any, newValue: any) -> any)
+	function DataClient:OnChanged(
+		key: string | { string },
+		callback: (key: string, oldValue: any, newValue: any) -> any
+	)
 		if type(key) == "string" then
 			local onChangedCallbacks = ON_CHANGED_CALLBACKS[key]
 
@@ -109,7 +112,7 @@ do
 					local callback = onChangedCallbacks[i]
 
 					if callback then
-						task.spawn(callback, oldValue, newValue)
+						task.spawn(callback, key, oldValue, newValue)
 					end
 				end
 			end
