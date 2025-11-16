@@ -1,3 +1,5 @@
+--!nocheck
+
 -- Services
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -104,9 +106,9 @@ function AnalyticsServer:ProcessCustomFields(customFields: { [Enum.AnalyticsCust
 				customFields[key.Name] = value
 			end
 		end
-
-		return customFields
 	end
+
+	return customFields
 end
 
 function AnalyticsServer:SendFunnel(

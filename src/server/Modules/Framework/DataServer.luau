@@ -1,3 +1,5 @@
+--!nocheck
+
 -- Services
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
@@ -201,6 +203,14 @@ function DataServer:OnDataChanged(player: Player, callback: (key: string, oldVal
 	ON_DATA_CHANGED_CALLBACKS[player] = ON_DATA_CHANGED_CALLBACKS[player] or {}
 
 	table.insert(ON_DATA_CHANGED_CALLBACKS[player], callback)
+end
+
+function DataServer:GetVersion()
+	return DATA_VERSION
+end
+
+function DataServer:GetBranch()
+	return if IS_STUDIO then "Studio" else "Game"
 end
 
 function DataServer.onPlayerAdded(player: Player)
